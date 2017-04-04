@@ -42,19 +42,35 @@ public extension Dispatchable {
 }
 
 // A state observer `Dispatcher`.
-public final class AnyObserverDispatcher<DispatcherType: Dispatchable> {
-    let state: AnyObserver<DispatcherType.StateType>
+public final class AnyObserverDispatcher<DispatcherType: Dispatchable>: ObserverType {
+    public typealias E = DispatcherType.StateType
+    
+    private let state: AnyObserver<E>
     
     init(_ dispatcher: DispatcherType = .shared) {
         self.state = dispatcher.observerState
     }
+    
+    public func on(_ event: Event<E>) {
+        state.on(event)
+    }
+    
+    func dispatch(_ value: E) {
+        on(.next(value))
+    }
 }
 
 // A state observable `Dispatcher`.
-public final class AnyObservableDispatcher<DispatcherType: Dispatchable> {
-    let state: Observable<DispatcherType.StateType>
+public final class AnyObservableDispatcher<DispatcherType: Dispatchable>: ObservableType {
+    public typealias E = DispatcherType.StateType
+    
+    private let state: Observable<E>
     
     init(_ dispatcher: DispatcherType = .shared) {
         self.state = dispatcher.observableState
+    }
+    
+    public func subscribe<O : ObserverType>(_ observer: O) -> Disposable where O.E == E {
+        return state.subscribe(observer)
     }
 }

@@ -58,7 +58,7 @@ class SearchUserAction {
     }
 
     func loading(_ value: Bool) {
-        self.dispatcher.state.onNext(.loading(value))
+        self.dispatcher.dispatch(.loading(value))
     }
 }
 ```
@@ -76,8 +76,7 @@ class SearchUserStore {
     let error = PublishSubject<Error>()
 
     init(dispatcher: Dispatcher = AnyObservableDispatcher(.shared)) {
-        dispatcher.state
-            .subscribe(onNext: { [unowned self] in
+        dispatcher.subscribe(onNext: { [unowned self] in
                 switch $0 {
                 case .loading(let value):
                     self.loading.value = value
